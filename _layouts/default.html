@@ -1,12 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+{% assign lang = page.lang | default: site.default_lang %}
+{% assign t = site.data.locales[lang].site %}
+<html lang="{{ lang }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page.title }} | {{ site.title }}</title>
+  {% assign raw = page.url | remove_first: '/' %}
+  {% assign prefix = raw | split: '/' | first %}
+  {% if prefix == lang %}
+    {% assign page_path = raw | remove_first: prefix | remove_first: '/' %}
+  {% else %}
+    {% assign page_path = raw %}
+  {% endif %}
+  {% for l in site.langs %}
+    {% if page_path == '' %}
+      {% assign href = site.url | append: site.baseurl | append: '/' | append: l | append: '/' %}
+    {% else %}
+      {% assign href = site.url | append: site.baseurl | append: '/' | append: l | append: '/' | append: page_path %}
+    {% endif %}
+    <link rel="alternate" hreflang="{{ l }}" href="{{ href }}" />
+  {% endfor %}
+  <link rel="canonical" href="{{ site.url }}{{ site.baseurl }}{{ page.url }}" />
   <link rel="stylesheet" href="{{ "/assets/style.css" | relative_url }}">
 </head>
 <body>
+  <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin:0.6rem 1rem 0 1rem;">
+    {% assign raw = page.url | remove_first: '/' %}
+    {% assign prefix = raw | split: '/' | first %}
+    {% if prefix == lang %}
+      {% assign page_path = raw | remove_first: prefix | remove_first: '/' %}
+    {% else %}
+      {% assign page_path = raw %}
+    {% endif %}
+    {% for l in site.langs %}
+      {% assign locale = site.data.locales[l].site %}
+      {% if l == lang %}
+        <span style="font-weight:600;">{{ locale.language_name }}</span>
+      {% else %}
+        {% if page_path == '' %}
+          {% assign target = '/' | append: l | append: '/' %}
+        {% else %}
+          {% assign target = '/' | append: l | append: '/' | append: page_path %}
+        {% endif %}
+        <a href="{{ target }}" style="text-decoration:none;" onclick="localStorage.setItem('typermate-lang-override','{{ l }}')">{{ locale.language_name }}</a>
+      {% endif %}
+    {% endfor %}
+  </div>
   <div class="main-content" style="margin-top:0.2em;">
     <div class="section-block" style="margin-top:0.2em;">
   <div class="section-header banner-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1em;">
@@ -21,6 +61,7 @@
         </div>
       </div>
     </div>
+    
     {% for section in page.sections %}
       <section id="{{ section.id }}" class="section-block">
         <h2>{{ section.title }}</h2>
@@ -29,7 +70,7 @@
     {% endfor %}
   </div>
   <footer>
-    &copy; 2025 TyperMate. All rights reserved.
+    {{ t.copyright }}
   </footer>
   <script src="{{ "/assets/scroll-animate.js" | relative_url }}"></script>
   <script>
@@ -46,6 +87,26 @@
       }
       setDarkModeClass();
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setDarkModeClass);
+    })();
+  </script>
+  <script>
+    // Redirect root to preferred language (only if the user hasn't set an override)
+    (function() {
+      try {
+        var override = localStorage.getItem('typermate-lang-override');
+        var path = window.location.pathname.replace(/\/+/g,'/');
+        if ((path === '/' || path === '' || path === '/index.html') && !override) {
+          var nav = window.navigator || {};
+          var lang = (nav.languages && nav.languages[0]) || nav.language || 'en';
+          lang = lang.split('-')[0];
+          var supported = {{ site.langs | jsonify }};
+          if (supported.indexOf(lang) !== -1) {
+            window.location.replace('/' + lang + '/');
+          }
+        }
+      } catch (e) {
+        console.warn('i18n redirect failed', e);
+      }
     })();
   </script>
 </body>

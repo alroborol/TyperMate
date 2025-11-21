@@ -1,0 +1,19 @@
+title: TyperMate
+baseurl: "/TyperMate"
+url: "https://alroborol.github.io"
+
+default_lang: en
+langs:
+  - en
+  - es
+  - zh
+
+# optional: set permalinks for language-specific pages
+permalink: /:path/
+
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: default
