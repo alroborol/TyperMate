@@ -1,0 +1,9 @@
+site:
+  title: "TyperMate"
+  download_label: "ダウンロード"
+  download_filename: "TyperMate 0.0.4"
+  copyright: "© 2025 TyperMate。無断転載を禁じます。"
+  language_name: "日本語"
+  switch_to: "切り替え先"
+  download_page_title: "ダウンロード中"
+  download_message: "ダウンロードが開始されない場合は、ここをクリックしてください。"

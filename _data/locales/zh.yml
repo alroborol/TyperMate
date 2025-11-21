@@ -1,0 +1,9 @@
+site:
+  title: "TyperMate"
+  download_label: "直接下载（免费版）"
+  download_filename: "TyperMate 0.0.4"
+  copyright: "© 2025 TyperMate。保留所有权利。"
+  language_name: "中文"
+  switch_to: "切换到"
+  download_page_title: "正在下载"
+  download_message: "如果下载没有开始，请点击这里。"

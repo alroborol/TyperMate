@@ -1,0 +1,31 @@
+title: TyperMate
+baseurl: "/TyperMate"
+url: "https://alroborol.github.io"
+
+default_lang: en
+langs:
+  - en
+  - es
+  - zh
+  - ja
+
+# Download artifact settings
+download:
+  filename: "TyperMate-0.0.4.zip"
+  label: "TyperMate 0.0.4"
+  path: "/assets/TyperMate-0.0.4.zip"
+
+# Optional analytics endpoint for download tracking (POST JSON)
+analytics:
+  download_endpoint: ""
+  ga_measurement_id: "G-ZJ3R35FZ1J"
+
+# optional: set permalinks for language-specific pages
+permalink: /:path/
+
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: default

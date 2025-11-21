@@ -1,0 +1,109 @@
+---
+layout: null
+permalink: /download/
+---
+<!DOCTYPE html>
+{% assign locales = site.data.locales %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="1; url={{ site.download.path | relative_url }}">
+  <link rel="canonical" href="{{ site.download.path | absolute_url }}" />
+  <title>Downloading {{ site.download.label }}...</title>
+  <script>
+    // i18n strings
+    var i18n = {
+      {% for lang in site.langs %}
+      '{{ lang }}': {
+        title: '{{ locales[lang].site.download_page_title }} {{ site.download.label }}...',
+        message: '{{ locales[lang].site.download_message }}'
+      }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    };
+  </script>
+  <script>
+    (function(){
+      try {
+        var params = new URLSearchParams(window.location.search || '');
+        if (params.get('gaDebug') === '1') {
+          if (window.gtag) {
+            try { window.gtag('event', 'debug_check', { send_to: '{{ site.analytics.ga_measurement_id }}', debug_mode: true }); } catch(e){console.warn('gtag debug send failed', e)}
+          } else {
+            console.warn('gtag not defined on download page');
+          }
+        }
+      } catch(e) { console.warn('GA debug helper error', e); }
+    })();
+  </script>
+  {% if site.analytics.ga_measurement_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.analytics.ga_measurement_id }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date());
+    gtag('config', '{{ site.analytics.ga_measurement_id }}', {
+      'page_title': document.title,
+      'page_path': window.location.pathname + window.location.search
+    });
+  </script>
+  {% endif %}
+  </head>
+  <body class="download-page">
+    <div class="message">
+      <h1 id="title">Downloading {{ site.download.label }}...</h1>
+      <p id="message">If your download doesn't start, <a href="{{ site.download.path | relative_url }}">click here</a>.</p>
+    </div>
+  </body>
+  <script>
+    (function() {
+      // Detect language from localStorage override or referrer
+      var lang = localStorage.getItem('typermate-lang-override');
+      if (!lang && document.referrer) {
+        var ref = document.referrer;
+        var langs = {{ site.langs | jsonify }};
+        for (var i = 0; i < langs.length; i++) {
+          if (ref.indexOf('/' + langs[i] + '/') !== -1) {
+            lang = langs[i];
+            break;
+          }
+        }
+      }
+      lang = lang || 'en';
+
+      // Update page content with localized strings
+      if (i18n[lang]) {
+        document.getElementById('title').textContent = i18n[lang].title;
+        var msgEl = document.getElementById('message');
+        msgEl.innerHTML = i18n[lang].message.replace('点击这里', '<a href="{{ site.download.path | relative_url }}">点击这里</a>')
+                                            .replace('haz clic aquí', '<a href="{{ site.download.path | relative_url }}">haz clic aquí</a>')
+                                            .replace('click here', '<a href="{{ site.download.path | relative_url }}">click here</a>')
+                                            .replace('ここをクリック', '<a href="{{ site.download.path | relative_url }}">ここをクリック</a>');
+      }
+
+      // Send analytics (beacon + GA) then redirect
+      try {
+        var endpoint = '{{ site.analytics.download_endpoint | default: "" }}';
+        var payload = JSON.stringify({ event: 'download_page_visit', lang: lang, ts: Date.now(), ref: document.referrer });
+        if (endpoint && navigator.sendBeacon) {
+          navigator.sendBeacon(endpoint, payload);
+        } else if (endpoint) {
+          fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(function(e){console.warn('download endpoint failed', e)});
+        }
+        // GA event (use beacon transport when possible)
+        if (window.gtag) {
+          try {
+            window.gtag('event', 'download_page', { language: lang, file: '{{ site.download.filename }}', transport_type: 'beacon', send_to: '{{ site.analytics.ga_measurement_id }}' });
+            console.log('gtag download_page event queued (send_to={{ site.analytics.ga_measurement_id }})');
+          } catch (e) { console.warn('gtag event failed', e); }
+        }
+      } catch (e) {
+        console.warn('analytics on download page failed', e);
+      }
+      // Redirect to download
+      setTimeout(function() {
+        window.location.href = '{{ site.download.path | relative_url }}';
+      }, 150);
+    })();
+  </script>
+</body>
+</html>

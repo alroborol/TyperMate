@@ -1,0 +1,9 @@
+site:
+  title: "TyperMate"
+  download_label: "Direct Download (Free Version)"
+  download_filename: "TyperMate 0.0.4"
+  copyright: "© 2025 TyperMate. All rights reserved."
+  language_name: "English"
+  switch_to: "Switch to"
+  download_page_title: "Downloading"
+  download_message: "If your download doesn't start, click here."

@@ -1,26 +1,139 @@
 <!DOCTYPE html>
-<html lang="en">
+{% assign lang = page.lang | default: site.default_lang %}
+{% assign t = site.data.locales[lang].site %}
+<html lang="{{ lang }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page.title }} | {{ site.title }}</title>
+  {% comment %}SEO: meta description (use page.intro or fallback to site.description){% endcomment %}
+  {% assign meta_description = page.intro | default: site.description | strip_newlines | strip_html | truncate: 160 %}
+  <meta name="description" content="{{ meta_description }}">
+  <meta name="keywords" content="macOS, input method, keyboard, productivity, TyperMate">
+  <meta name="author" content="{{ site.title }}">
+  {% comment %}Open Graph / Twitter{% endcomment %}
+  <meta property="og:locale" content="{{ lang }}">
+  <meta property="og:site_name" content="{{ site.title }}">
+  <meta property="og:title" content="{{ page.title }} | {{ site.title }}">
+  <meta property="og:description" content="{{ meta_description }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}{{ page.url }}">
+  {% if page.banner-image %}
+  <meta property="og:image" content="{{ page.banner-image | absolute_url }}">
+  {% else %}
+  <meta property="og:image" content="{{ '/assets/og-default.png' | absolute_url }}">
+  {% endif %}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ page.title }} | {{ site.title }}">
+  <meta name="twitter:description" content="{{ meta_description }}">
+  <meta name="twitter:image" content="{% if page.banner-image %}{{ page.banner-image | absolute_url }}{% else %}{{ '/assets/og-default.png' | absolute_url }}{% endif %}">
+
+  {% comment %}Structured data: SoftwareApplication{% endcomment %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "{{ site.title }}",
+    "applicationCategory": "DesktopApplication",
+    "operatingSystem": "macOS",
+    "description": "{{ meta_description }}",
+    "url": "{{ site.url }}{{ site.baseurl }}{{ page.url }}",
+    "softwareVersion": "{{ site.download.version | default: site.download.filename | default: '' }}",
+    "downloadUrl": "{{ site.url }}{{ site.baseurl }}{{ site.download.path }}",
+    "image": "{% if page.banner-image %}{{ page.banner-image | absolute_url }}{% else %}{{ '/assets/og-default.png' | absolute_url }}{% endif %}"
+  }
+  </script>
+  {% assign raw = page.url | remove_first: '/' %}
+  {% assign prefix = raw | split: '/' | first %}
+  {% if prefix == lang %}
+    {% assign page_path = raw | remove_first: prefix | remove_first: '/' %}
+  {% else %}
+    {% assign page_path = raw %}
+  {% endif %}
+  {% for l in site.langs %}
+    {% if page_path == '' %}
+      {% assign href = site.url | append: site.baseurl | append: '/' | append: l | append: '/' %}
+    {% else %}
+      {% assign href = site.url | append: site.baseurl | append: '/' | append: l | append: '/' | append: page_path %}
+    {% endif %}
+    <link rel="alternate" hreflang="{{ l }}" href="{{ href }}" />
+  {% endfor %}
+  <link rel="canonical" href="{{ site.url }}{{ site.baseurl }}{{ page.url }}" />
   <link rel="stylesheet" href="{{ "/assets/style.css" | relative_url }}">
+  {% if site.analytics.ga_measurement_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.analytics.ga_measurement_id }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date());
+    gtag('config', '{{ site.analytics.ga_measurement_id }}', {
+      'page_title': document.title,
+      'page_path': window.location.pathname + window.location.search + window.location.hash
+    });
+  </script>
+  <script>
+    // GA debug helper: visit any page with ?gaDebug=1 to send a single debug event.
+    (function(){
+      try {
+        var params = new URLSearchParams(window.location.search || '');
+        if (params.get('gaDebug') === '1') {
+          if (window.gtag) {
+            try {
+              window.gtag('event', 'debug_check', { send_to: '{{ site.analytics.ga_measurement_id }}', debug_mode: true });
+              console.log('GA debug_check event sent to {{ site.analytics.ga_measurement_id }}');
+            } catch (e) { console.warn('gtag debug send failed', e); }
+          } else {
+            console.warn('gtag not defined — gtag.js may not have loaded yet');
+          }
+        }
+      } catch (e) { console.warn('GA debug helper error', e); }
+    })();
+  </script>
+  {% endif %}
 </head>
 <body>
-  <div class="main-content" style="margin-top:0.2em;">
-    <div class="section-block" style="margin-top:0.2em;">
-  <div class="section-header banner-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1em;">
-        <div style="flex:2; min-width:180px;">
-          <h1 style="margin-bottom:0.05em; margin-top:0;">{{ page.title }}</h1>
-          <div class="banner-intro" style="font-size:1.1em; color:var(--banner-intro-color, #4b1979); margin-top:0; margin-bottom:0.1em;">
+  <!-- language selector moved into main content banner -->
+  <div class="main-content">
+    <div class="section-block">
+  <div class="section-header banner-header">
+        <div class="banner-left">
+          <div class="banner-lang-wrapper">
+            {% assign raw = page.url | remove_first: '/' %}
+            {% assign prefix = raw | split: '/' | first %}
+            {% if prefix == lang %}
+              {% assign page_path = raw | remove_first: prefix | remove_first: '/' %}
+            {% else %}
+              {% assign page_path = raw %}
+            {% endif %}
+            <div class="banner-lang">
+              {% for l in site.langs %}
+                {% assign locale = site.data.locales[l].site %}
+                {% if l == lang %}
+                  <span class="banner-lang-current">{{ locale.language_name }}</span>
+                {% else %}
+                  {% assign target_path = '/' | append: l | append: '/' | append: page_path %}
+                  <a class="banner-lang-link" href="{{ target_path | absolute_url }}" onclick="localStorage.setItem('typermate-lang-override','{{ l }}')">{{ locale.language_name }}</a>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          <h1 class="banner-title">{{ page.title }}</h1>
+          <div class="banner-intro">
             {{ page.intro | markdownify }}
           </div>
+          <div class="banner-cta">
+            <a class="download-button" href="{{ site.download.path | relative_url }}" aria-label="{{ t.download_label }}" onclick="trackDownload(event, '{{ lang }}')">
+                <img src="{{ '/assets/icons/download.svg' | relative_url }}" alt="" aria-hidden="true">
+                <span>{{ t.download_label }}</span>
+              </a>
+          </div>
         </div>
-        <div style="flex:1; min-width:140px; display:flex; justify-content:flex-end; align-items:center;">
-          <img src="{{ page.banner-image | relative_url }}" alt="App Icon" style="width:192px; height:192px; border-radius:20%; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-top:18px;">
+        <div class="banner-right">
+          <img src="{{ page.banner-image | relative_url }}" alt="App Icon" class="banner-image">
         </div>
       </div>
     </div>
+    
     {% for section in page.sections %}
       <section id="{{ section.id }}" class="section-block">
         <h2>{{ section.title }}</h2>
@@ -29,7 +142,7 @@
     {% endfor %}
   </div>
   <footer>
-    &copy; 2025 TyperMate. All rights reserved.
+    {{ t.copyright }}
   </footer>
   <script src="{{ "/assets/scroll-animate.js" | relative_url }}"></script>
   <script>
@@ -46,6 +159,120 @@
       }
       setDarkModeClass();
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setDarkModeClass);
+    })();
+  </script>
+  <script>
+    // Redirect root to preferred language (only if the user hasn't set an override)
+    (function() {
+      try {
+        var override = localStorage.getItem('typermate-lang-override');
+        var path = window.location.pathname.replace(/\/+/g,'/');
+        var base = '{{ site.baseurl }}' || '';
+        var supported = {{ site.langs | jsonify }};
+
+        // Treat repository base (e.g. '/TyperMate' or '/TyperMate/') as root as well
+        var rootCandidates = ['/', '/index.html', base, base + '/'];
+        var isRoot = rootCandidates.indexOf(path) !== -1;
+
+        if (isRoot && !override) {
+          var nav = window.navigator || {};
+          var lang = (nav.languages && nav.languages[0]) || nav.language || 'en';
+          lang = lang.split('-')[0];
+          if (supported.indexOf(lang) !== -1) {
+            window.location.replace('{{ site.url }}{{ site.baseurl }}/' + lang + '/');
+          }
+        }
+      } catch (e) {
+        console.warn('i18n redirect failed', e);
+      }
+    })();
+  </script>
+  <script>
+    // Improved download tracking helper using gtag event_callback with fallback.
+    function trackDownload(e, lang) {
+      try {
+        if (e && e.preventDefault) e.preventDefault();
+        var downloadUrl = '{{ site.download.path | relative_url }}';
+        var payload = JSON.stringify({ event: 'download_click', lang: lang, path: window.location.pathname, ts: Date.now() });
+        var endpoint = '{{ site.analytics.download_endpoint | default: "" }}';
+
+        if (endpoint) {
+          try {
+            if (navigator.sendBeacon) {
+              var sent = navigator.sendBeacon(endpoint, payload);
+              console.log('sendBeacon result:', sent, 'endpoint:', endpoint);
+            } else {
+              fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).then(function(){ console.log('fetch sent to endpoint'); }).catch(function(err){ console.warn('download tracking failed', err); });
+            }
+          } catch (err) { console.warn('download endpoint error', err); }
+        } else {
+          console.log('Download click (no endpoint):', payload);
+        }
+
+        var navigated = false;
+        function doNavigate() {
+          if (navigated) return;
+          navigated = true;
+          window.location.href = downloadUrl;
+        }
+
+        if (window.gtag) {
+          try {
+            window.gtag('event', 'download', {
+              event_label: '{{ site.download.filename }}',
+              event_category: 'engagement',
+              language: lang,
+              transport_type: 'beacon',
+              send_to: '{{ site.analytics.ga_measurement_id }}',
+              event_callback: function() { console.log('gtag event_callback fired'); doNavigate(); }
+            });
+            // Safety fallback if callback never runs
+            setTimeout(doNavigate, 1500);
+            console.log('gtag download event queued (send_to={{ site.analytics.ga_measurement_id }})');
+            return;
+          } catch (err) { console.warn('gtag event failed', err); }
+        }
+
+        // If no gtag, delay briefly to allow beacon, then navigate
+        setTimeout(doNavigate, 400);
+      } catch (e) {
+        console.warn('trackDownload error', e);
+        window.location.href = '{{ site.download.path | relative_url }}';
+      }
+    }
+  </script>
+  <script>
+    // Debug toolbar: visible when ?gaDebug=1 — lets you send a test GA event and see console logs
+    (function(){
+      try {
+        var params = new URLSearchParams(window.location.search || '');
+        if (params.get('gaDebug') === '1') {
+          var bar = document.createElement('div');
+          bar.style.position = 'fixed';
+          bar.style.right = '12px';
+          bar.style.bottom = '12px';
+          bar.style.zIndex = 9999;
+          bar.style.background = 'rgba(0,0,0,0.7)';
+          bar.style.color = '#fff';
+          bar.style.padding = '8px 10px';
+          bar.style.borderRadius = '8px';
+          bar.style.fontSize = '13px';
+          bar.innerHTML = '<button id="__ga_debug_btn" style="background:#6b21a8;color:#fff;border:none;padding:6px 8px;border-radius:6px;cursor:pointer">Send GA test</button> <span style="margin-left:8px">Debug mode</span>';
+          document.body.appendChild(bar);
+          var btn = document.getElementById('__ga_debug_btn');
+          btn.addEventListener('click', function(){
+            try {
+              console.log('GA debug: attempting to send test event...');
+              if (window.gtag) {
+                window.gtag('event','debug_manual',{ send_to: '{{ site.analytics.ga_measurement_id }}', debug_mode: true, event_callback: function(){ console.log('GA debug_manual callback fired'); } });
+                console.log('gtag event queued');
+              } else {
+                console.warn('gtag not loaded');
+              }
+            } catch(e) { console.warn('GA debug send failed', e); }
+          });
+        }
+      } catch(e) { console.warn('GA debug toolbar error', e); }
     })();
   </script>
 </body>
