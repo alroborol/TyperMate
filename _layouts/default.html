@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page.title }} | {{ site.title }}</title>
+  <link rel="stylesheet" href="{{ "/assets/style.css" | relative_url }}">
+</head>
+<body>
+  <div class="main-content" style="margin-top:0.2em;">
+    <div class="section-block" style="margin-top:0.2em;">
+  <div class="section-header banner-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1em;">
+        <div style="flex:2; min-width:180px;">
+          <h1 style="margin-bottom:0.05em; margin-top:0;">{{ page.title }}</h1>
+          <div class="banner-intro" style="font-size:1.1em; color:var(--banner-intro-color, #4b1979); margin-top:0; margin-bottom:0.1em;">
+            {{ page.intro | markdownify }}
+          </div>
+        </div>
+        <div style="flex:1; min-width:140px; display:flex; justify-content:flex-end; align-items:center;">
+          <img src="{{ page.banner-image | relative_url }}" alt="App Icon" style="width:192px; height:192px; border-radius:20%; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-top:18px;">
+        </div>
+      </div>
+    </div>
+    {% for section in page.sections %}
+      <section id="{{ section.id }}" class="section-block">
+        <h2>{{ section.title }}</h2>
+        <div>{{ section.content | markdownify }}</div>
+      </section>
+    {% endfor %}
+  </div>
+  <footer>
+    &copy; 2025 TyperMate. All rights reserved.
+  </footer>
+  <script src="{{ "/assets/scroll-animate.js" | relative_url }}"></script>
+  <script>
+    // Fallback: add .dark-mode class if prefers-color-scheme: dark
+    (function() {
+      function setDarkModeClass() {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.classList.add('dark-mode');
+          document.body.classList.add('dark-mode');
+        } else {
+          document.documentElement.classList.remove('dark-mode');
+          document.body.classList.remove('dark-mode');
+        }
+      }
+      setDarkModeClass();
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setDarkModeClass);
+    })();
+  </script>
+</body>
+</html>
