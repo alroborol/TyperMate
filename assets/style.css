@@ -14,19 +14,19 @@ body {
 }
 
 .main-content {
-  max-width: 700px;
-  margin: 0.7em auto 2em auto;
+  max-width: 1100px;
+  margin: 0.9em auto 2.5em auto;
   background: none;
   box-shadow: none;
-  padding: 0;
+  padding: 0 1.2rem;
 }
 
 .section-block {
   border-radius: 10px;
   box-shadow: none;
   margin-bottom: 1.5em;
-  padding: 1.6em 3vw 1.2em 3vw;
-  max-width: 900px;
+  padding: 1.6em 4vw 1.2em 4vw;
+  max-width: 1100px;
   margin-left: auto;
   margin-right: auto;
   opacity: 0;
@@ -113,18 +113,6 @@ footer {
     padding: 1.2em 2vw 1.2em 2vw;
   }
 }
-@media (max-width: 383px) {
-  .banner-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .banner-header > div:last-child {
-    margin-top: 0.7em;
-    width: 100%;
-    display: flex;
-    justify-content: flex-start;
-  }
-}
 
 /* --- Dark mode --- */
 .dark-mode body {
@@ -133,26 +121,27 @@ footer {
 }
 .dark-mode .main-content {
   color: inherit;
+  background: transparent;
 }
 .dark-mode .section-block {
-  max-width: 900px;
+  max-width: 1100px;
   margin-left: auto;
   margin-right: auto;
 }
 .dark-mode .section-block:nth-of-type(odd) {
-  background: #23143a;
+  background: rgba(255,255,255,0.02);
 }
 .dark-mode .section-block:nth-of-type(even) {
-  background: #1a102b;
+  background: rgba(255,255,255,0.01);
 }
 .dark-mode h1, .dark-mode h2, .dark-mode h3 {
   color: #c3a6fa;
 }
 .dark-mode a {
-  color: #c3a6fa;
+  color: #d8b4fe;
 }
 .dark-mode a:hover, .dark-mode a:focus {
-  color: #d8b4fe;
+  color: #fff;
 }
 .dark-mode blockquote {
   color: #c3a6fa;
@@ -164,7 +153,7 @@ footer {
   color: #c3a6fa;
 }
 .dark-mode img {
-  box-shadow: 0 2px 12px rgba(167, 139, 250, 0.18);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.5);
 }
 .dark-mode footer {
   color: #a48fd6;
@@ -175,10 +164,180 @@ footer {
   color: #e3d8fa;
 }
 
+/* Dark-mode refinements for banner and controls */
+.dark-mode .banner-intro {
+  color: #e7d9ff;
+}
+.dark-mode .banner-title {
+  color: #f3e8ff;
+}
+.dark-mode .banner-lang-current {
+  color: #fff;
+}
+.dark-mode .banner-lang-link {
+  color: #d8b4fe;
+}
+.dark-mode .banner-lang-link:hover, .dark-mode .banner-lang-link:focus {
+  color: #fff;
+}
+.dark-mode .download-button {
+  background: #5a189a;
+}
+.dark-mode .download-button:hover, .dark-mode .download-button:focus, .dark-mode .download-button:active {
+  background: #43106f;
+  color: #fff;
+}
+.dark-mode .banner-image {
+  box-shadow: 0 6px 28px rgba(0,0,0,0.6);
+}
+
 .banner-intro {
   color: var(--banner-intro-color, #4b1979);
 }
 .dark-mode .banner-intro {
   --banner-intro-color: #e0c8ff;
   color: var(--banner-intro-color, #e0c8ff);
+}
+
+/* Language selector placed in the banner */
+.banner-lang {
+  font-size: 0.95rem;
+  color: inherit;
+}
+
+.banner-lang-current {
+  font-weight: 600;
+}
+.banner-lang-link {
+  text-decoration: none;
+  color: inherit;
+}
+.banner-lang-link:hover, .banner-lang-link:focus {
+  text-decoration: underline;
+}
+
+/* Banner layout classes */
+.banner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.banner-left {
+  flex: 2;
+  min-width: 180px;
+}
+.banner-right {
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+}
+.banner-lang-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.4rem;
+}
+.banner-title {
+  margin-bottom: 0.05em;
+  margin-top: 0;
+}
+.banner-cta {
+  margin-top: 0.6rem;
+}
+.banner-image {
+  width: 192px;
+  height: 192px;
+  border-radius: 20%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-top: 18px;
+}
+
+@media (max-width: 383px) {
+  .banner-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .banner-right {
+    margin-top: 0.7em;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+  }
+}
+
+/* Download redirect page */
+.download-page {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  background: #f5f5f7;
+}
+.download-page .message {
+  text-align: center;
+  padding: 2rem;
+}
+.download-page .message h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+.download-page .message a {
+  color: #6b21a8;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Download button styles */
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--accent, #6b21a8);
+  color: #fff;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.download-button img,
+.download-button svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  object-fit: contain;
+  align-self: center;
+  vertical-align: middle;
+  line-height: 0;
+}
+.download-button:hover {
+  background: var(--accent-dark, #7c3aed);
+}
+.download-button:hover, .download-button:focus, .download-button:active {
+  color: #fff;
+}
+.download-button:focus {
+  outline: 3px solid rgba(123, 47, 224, 0.18);
+  outline-offset: 2px;
+}
+@media (max-width: 480px) {
+  .download-button {
+    padding: 0.45rem 0.7rem;
+    gap: 0.4rem;
+    font-size: 0.95rem;
+  }
+}
+/* Dark-mode variant for icon coloring (recolors white icon to purple-ish) */
+.dark-mode .download-button img {
+  filter: invert(1) sepia(0.6) saturate(4) hue-rotate(250deg) brightness(0.95);
 }
